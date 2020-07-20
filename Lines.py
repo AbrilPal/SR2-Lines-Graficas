@@ -1,6 +1,6 @@
 # Andrea Abril Palencia Gutierrez, 18198
-# SR1: Points --- Graficas por computadora, seccion 20
-# 07/07/2020 -- 13/07/2020
+# SR2: Lines --- Graficas por computadora, seccion 20
+# 20/07/2020
 
 # libreria
 import struct
@@ -59,13 +59,54 @@ class Render(object):
 
     # crear un punto en cualquier lugar de la pantalla 
     def glVertex(self, x, y):
-        xw = int((x + 1) * (self.viewport_ancho/2) + self.viewport_x)
-        yw = int((y + 1) * (self.viewport_alto/2) + self.viewport_y)
-        self.pixels[xw][yw] = self.punto_color
+       # xw = int((x + 1) * (self.viewport_ancho/2) + self.viewport_x)
+       # yw = int((y + 1) * (self.viewport_alto/2) + self.viewport_y)
+        self.pixels[x][y] = self.punto_color
 
     # permite cambiar el color del punto
     def glColor(self, color_p):
         self.punto_color = color_p
+
+    # hacer lineas
+    def  glLine ( self , x0 , y0 , x1 , y1 ):
+        # coordenasdas en pixeles
+        x0 = int((x0 + 1) * (self.viewport_ancho/2) + self.viewport_x)
+        y0 = int((y0 + 1) * (self.viewport_alto/2) + self.viewport_y)
+        x1 = int((x1 + 1) * (self.viewport_ancho/2) + self.viewport_x)
+        y1 = int((y1 + 1) * (self.viewport_alto/2) + self.viewport_y)
+
+        dy = abs(y1 - y0)
+        dx = abs(x1 - x0)
+
+        inclinado = dy > dx
+
+        if inclinado:
+            x0,y0 = y0,x0
+            x1,y1 = y1,x1
+
+        if x0 > x1:
+            x0,x1 = x1,x0
+            y0,y1 = y1,y0
+
+        dy = abs(y1 - y0)
+        dx = abs( x1 - x0)
+
+        # desplazamiento
+        des = 0 
+        limit = 0.5
+        m = dy/dx
+        y = y0
+
+        for x in range(x0, x1 + 1):
+            if inclinado:
+                self.glVertex(y, x)
+            else:
+                self.glVertex(x, y)
+
+            des += m
+            if des >= limit:
+                y += 1 if y0 < y1 else -1
+                limit += 1
 
     # escribe el archivo
     def glFinish(self, name):
